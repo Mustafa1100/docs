@@ -1,0 +1,219 @@
+---
+title: 'Get Record Count'
+description: 'Get the total count of records based on filter parameters'
+api: 'POST /api/v1/suppliers/data/count'
+---
+
+## Overview
+
+This endpoint returns the total count of records available based on your filter criteria without retrieving the actual data. Use this before fetching data to know how many records match your filters and plan pagination accordingly.
+
+<Note>
+  **Authorization Required** - You must include a valid Bearer token in the Authorization header. Contact [sales@rulebook.company](mailto:sales@rulebook.company) to obtain API access.
+</Note>
+
+## Request Body
+
+<ParamField body="supplier_name" type="string" required>
+  Name or code of the supplier (e.g., NYSE, NASDAQ, CBOE)
+</ParamField>
+
+<ParamField body="fee_type" type="string" required>
+  Type of fee to retrieve
+  - `option` - Options trading fees
+  - `equity` - Equity trading fees
+</ParamField>
+
+<ParamField body="fee_category" type="string" required>
+  Category of fees to retrieve
+  - `Fee And Rebates`
+  - `Legal Regulatory Fees`
+  - `Market Data Fees`
+  - `Participant Fee`
+  - `Port Fees And Other Services`
+</ParamField>
+
+<ParamField body="action" type="string" required>
+  Trading action type
+  - `Make` - Liquidity providing orders
+  - `Take` - Liquidity taking orders
+  - `Open` - Opening transactions
+  - `Routed & Other` - Routed orders and other actions
+</ParamField>
+
+<ParamField body="participant" type="string" required>
+  Participant type for the data
+  - `All` - All participant types
+  - `Away Market Maker` - Market makers from other exchanges
+  - `Market Maker` - Exchange market makers
+  - `Broker Dealer` - Broker-dealer firms
+  - `Customer` - Retail and institutional customers
+  - `Firm` - Proprietary trading firms
+  - `Professional & Other` - Professional traders and other categories
+</ParamField>
+
+<ParamField body="start_date" type="string">
+  Start date for data retrieval (ISO 8601 format: YYYY-MM-DD)
+</ParamField>
+
+<ParamField body="end_date" type="string">
+  End date for data retrieval (ISO 8601 format: YYYY-MM-DD)
+</ParamField>
+
+## Request Example
+
+```bash
+curl -X POST https://api.rulebook.company/v1/suppliers/data/count \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "supplier_name": "NYSE",
+    "fee_type": "equity",
+    "fee_category": "Fee And Rebates",
+    "action": "Make",
+    "participant": "Market Maker",
+    "start_date": "2024-01-01",
+    "end_date": "2024-12-31"
+  }'
+```
+
+## Response
+
+<ResponseField name="success" type="boolean">
+  Indicates if the request was successful
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  Container for the response data
+
+  <Expandable title="Data Object">
+    <ResponseField name="supplier" type="string">
+      Name of the supplier
+    </ResponseField>
+
+    <ResponseField name="fee_type" type="string">
+      Type of fee (option/equity)
+    </ResponseField>
+
+    <ResponseField name="fee_category" type="string">
+      Category of fees
+    </ResponseField>
+
+    <ResponseField name="action" type="string">
+      Trading action type
+    </ResponseField>
+
+    <ResponseField name="participant" type="string">
+      Participant type
+    </ResponseField>
+
+    <ResponseField name="date_range" type="object">
+      Date range for the query
+      <Expandable title="Date Range">
+        <ResponseField name="start" type="string">
+          Start date (ISO 8601)
+        </ResponseField>
+        <ResponseField name="end" type="string">
+          End date (ISO 8601)
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+
+    <ResponseField name="total_count" type="integer">
+      Total number of records matching the filter criteria
+    </ResponseField>
+
+    <ResponseField name="pagination_info" type="object">
+      Information for paginating through the results
+      <Expandable title="Pagination Info">
+        <ResponseField name="max_records_per_request" type="integer">
+          Maximum records allowed per request (100)
+        </ResponseField>
+        <ResponseField name="total_pages" type="integer">
+          Number of pages required to fetch all records (based on 100 records per page)
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "supplier": "NYSE",
+    "fee_type": "equity",
+    "fee_category": "Fee And Rebates",
+    "action": "Make",
+    "participant": "Market Maker",
+    "date_range": {
+      "start": "2024-01-01T00:00:00Z",
+      "end": "2024-12-31T23:59:59Z"
+    },
+    "total_count": 365,
+    "pagination_info": {
+      "max_records_per_request": 100,
+      "total_pages": 4
+    }
+  }
+}
+```
+
+## Usage Pattern
+
+<Steps>
+  <Step title="Get Total Count">
+    First, call this endpoint to get the total number of records
+    ```bash
+    POST /api/v1/suppliers/data/count
+    # Response: { "total_count": 365, "total_pages": 4 }
+    ```
+  </Step>
+
+  <Step title="Fetch Data in Batches">
+    Then, fetch data in batches using pagination
+    ```bash
+    POST /api/v1/suppliers/data
+    # With offset: 0, limit: 100 (records 1-100)
+    # With offset: 100, limit: 100 (records 101-200)
+    # With offset: 200, limit: 100 (records 201-300)
+    # With offset: 300, limit: 100 (records 301-365)
+    ```
+  </Step>
+</Steps>
+
+## Error Responses
+
+<ResponseExample>
+```json 400 Bad Request
+{
+  "error": "Bad Request",
+  "message": "Invalid parameter value",
+  "details": {
+    "field": "fee_type",
+    "provided": "invalid_type",
+    "allowed": ["option", "equity"]
+  }
+}
+```
+
+```json 401 Unauthorized
+{
+  "error": "Unauthorized",
+  "message": "Invalid or missing API key"
+}
+```
+
+```json 404 Not Found
+{
+  "error": "Not Found",
+  "message": "No data found for the specified parameters"
+}
+```
+</ResponseExample>
+
+<Tip>
+  Use this endpoint before fetching data to understand how many API calls you'll need to retrieve all records.
+</Tip>

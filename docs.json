@@ -52,6 +52,7 @@
               "api-reference/endpoint/fee-categories",
               "api-reference/endpoint/actions",
               "api-reference/endpoint/participants",
+              "api-reference/endpoint/record-count",
               "api-reference/endpoint/supplier-data"
             ]
           }
