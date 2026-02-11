@@ -1,11 +1,11 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "mint",
+  "theme": "aspen",
   "name": "Rulebook Company",
   "colors": {
-    "primary": "#14B8A6",
-    "light": "#5EEAD4",
-    "dark": "#0F766E"
+    "primary": "#22D3EE",
+    "light": "#22D3EE",
+    "dark": "#0780a9"
   },
   "favicon": "/favicon.svg",
   "navigation": {
@@ -100,6 +100,5 @@
       "github": "https://github.com/rulebook-company",
       "linkedin": "https://linkedin.com/company/rulebook-company"
     }
-  },
-  "customCSS": ["custom.css"]
+  }
 }
