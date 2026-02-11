@@ -1,0 +1,332 @@
+---
+title: "Playground"
+description: "Test API endpoints and explore data samples"
+---
+
+## API Playground
+
+Test Rulebook Company API endpoints directly from your browser.
+
+<Note>
+**Note:** The playground uses sample data for demonstration. You'll need a valid API key for production access.
+</Note>
+
+## Sample API Calls
+
+### Get Exchange Fee Schedule
+
+Retrieve current fee schedules for a specific exchange:
+
+<CodeGroup>
+
+```bash cURL
+curl https://api.rulebook.company/v1/exchanges/NASDAQ/fees \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json"
+```
+
+```python Python
+import requests
+
+url = "https://api.rulebook.company/v1/exchanges/NASDAQ/fees"
+headers = {
+    "Authorization": "Bearer YOUR_API_KEY",
+    "Content-Type": "application/json"
+}
+
+response = requests.get(url, headers=headers)
+print(response.json())
+```
+
+```javascript JavaScript
+const fetch = require('node-fetch');
+
+const url = 'https://api.rulebook.company/v1/exchanges/NASDAQ/fees';
+const headers = {
+    'Authorization': 'Bearer YOUR_API_KEY',
+    'Content-Type': 'application/json'
+};
+
+fetch(url, { headers })
+    .then(response => response.json())
+    .then(data => console.log(data));
+```
+
+</CodeGroup>
+
+**Example Response:**
+```json
+{
+  "exchange": "NASDAQ",
+  "effective_date": "2024-01-01",
+  "fee_schedule": {
+    "maker_fee": -0.0002,
+    "taker_fee": 0.0003,
+    "tier_thresholds": {
+      "tier_1": {
+        "volume": 1000000,
+        "maker_rebate": -0.00025
+      },
+      "tier_2": {
+        "volume": 5000000,
+        "maker_rebate": -0.0003
+      }
+    }
+  },
+  "last_updated": "2024-01-01T00:00:00Z"
+}
+```
+
+### Get Exchange Rules
+
+Retrieve trading rules and regulations for an exchange:
+
+<CodeGroup>
+
+```bash cURL
+curl https://api.rulebook.company/v1/exchanges/NYSE/rules \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json"
+```
+
+```python Python
+import requests
+
+url = "https://api.rulebook.company/v1/exchanges/NYSE/rules"
+headers = {
+    "Authorization": "Bearer YOUR_API_KEY",
+    "Content-Type": "application/json"
+}
+
+response = requests.get(url, headers=headers)
+print(response.json())
+```
+
+```javascript JavaScript
+const url = 'https://api.rulebook.company/v1/exchanges/NYSE/rules';
+const headers = {
+    'Authorization': 'Bearer YOUR_API_KEY',
+    'Content-Type': 'application/json'
+};
+
+fetch(url, { headers })
+    .then(response => response.json())
+    .then(data => console.log(data));
+```
+
+</CodeGroup>
+
+**Example Response:**
+```json
+{
+  "exchange": "NYSE",
+  "rules": {
+    "trading_hours": {
+      "pre_market": "04:00:00",
+      "regular": "09:30:00-16:00:00",
+      "after_hours": "16:00:00-20:00:00"
+    },
+    "tick_size": 0.01,
+    "lot_size": 100,
+    "circuit_breakers": {
+      "level_1": 0.07,
+      "level_2": 0.13,
+      "level_3": 0.20
+    }
+  },
+  "effective_date": "2024-01-01",
+  "last_updated": "2024-01-01T00:00:00Z"
+}
+```
+
+### Get Order Types
+
+Retrieve supported order types for a specific venue:
+
+<CodeGroup>
+
+```bash cURL
+curl https://api.rulebook.company/v1/exchanges/CME/order-types \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json"
+```
+
+```python Python
+import requests
+
+url = "https://api.rulebook.company/v1/exchanges/CME/order-types"
+headers = {
+    "Authorization": "Bearer YOUR_API_KEY",
+    "Content-Type": "application/json"
+}
+
+response = requests.get(url, headers=headers)
+print(response.json())
+```
+
+```javascript JavaScript
+const url = 'https://api.rulebook.company/v1/exchanges/CME/order-types';
+const headers = {
+    'Authorization': 'Bearer YOUR_API_KEY',
+    'Content-Type': 'application/json'
+};
+
+fetch(url, { headers })
+    .then(response => response.json())
+    .then(data => console.log(data));
+```
+
+</CodeGroup>
+
+**Example Response:**
+```json
+{
+  "exchange": "CME",
+  "order_types": [
+    {
+      "type": "LIMIT",
+      "description": "Limit order with specified price",
+      "supported": true
+    },
+    {
+      "type": "MARKET",
+      "description": "Market order at best available price",
+      "supported": true
+    },
+    {
+      "type": "STOP",
+      "description": "Stop order triggered at specified price",
+      "supported": true
+    },
+    {
+      "type": "IOC",
+      "description": "Immediate or cancel order",
+      "supported": true
+    },
+    {
+      "type": "FOK",
+      "description": "Fill or kill order",
+      "supported": true
+    }
+  ],
+  "last_updated": "2024-01-01T00:00:00Z"
+}
+```
+
+### Historical Data Query
+
+Query historical fee schedules:
+
+<CodeGroup>
+
+```bash cURL
+curl "https://api.rulebook.company/v1/exchanges/NASDAQ/fees/historical?start_date=2023-01-01&end_date=2023-12-31" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json"
+```
+
+```python Python
+import requests
+
+url = "https://api.rulebook.company/v1/exchanges/NASDAQ/fees/historical"
+params = {
+    "start_date": "2023-01-01",
+    "end_date": "2023-12-31"
+}
+headers = {
+    "Authorization": "Bearer YOUR_API_KEY",
+    "Content-Type": "application/json"
+}
+
+response = requests.get(url, headers=headers, params=params)
+print(response.json())
+```
+
+```javascript JavaScript
+const params = new URLSearchParams({
+    start_date: '2023-01-01',
+    end_date: '2023-12-31'
+});
+
+const url = `https://api.rulebook.company/v1/exchanges/NASDAQ/fees/historical?${params}`;
+const headers = {
+    'Authorization': 'Bearer YOUR_API_KEY',
+    'Content-Type': 'application/json'
+};
+
+fetch(url, { headers })
+    .then(response => response.json())
+    .then(data => console.log(data));
+```
+
+</CodeGroup>
+
+## Interactive Testing
+
+<Card
+  title="Download Sample Data"
+  icon="download"
+  href="https://rulebookcompany.com"
+>
+  Get sample datasets to test your integration locally before using the live API.
+</Card>
+
+## Common Testing Scenarios
+
+<CardGroup cols={2}>
+  <Card
+    title="Fee Optimization"
+    icon="dollar-sign"
+  >
+    Compare fee schedules across exchanges to find the most cost-effective venues for your trading strategy.
+  </Card>
+  <Card
+    title="Historical Analysis"
+    icon="chart-line"
+  >
+    Query historical data to backtest how fee changes would have impacted past trades.
+  </Card>
+  <Card
+    title="Rule Changes"
+    icon="bell"
+  >
+    Monitor when exchange rules change and test how your systems respond to updates.
+  </Card>
+  <Card
+    title="Multi-Venue Routing"
+    icon="route"
+  >
+    Test smart order routing logic across multiple venues with real microstructure data.
+  </Card>
+</CardGroup>
+
+## Rate Limits
+
+When testing, be aware of API rate limits:
+
+- **Standard tier**: 100 requests/minute
+- **Professional tier**: 500 requests/minute
+- **Enterprise tier**: Custom limits
+
+<Tip>
+Use the `X-RateLimit-Remaining` response header to track your remaining quota.
+</Tip>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card
+    title="API Reference"
+    icon="code"
+    href="/api-reference/introduction"
+  >
+    Explore all available endpoints and parameters.
+  </Card>
+  <Card
+    title="Authentication"
+    icon="shield"
+    href="/api-reference/authentication"
+  >
+    Learn about API authentication and security.
+  </Card>
+</CardGroup>

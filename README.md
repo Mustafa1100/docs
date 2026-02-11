@@ -1,28 +1,17 @@
-# Mintlify Starter Kit
+# Rulebook Company Documentation
 
-Use the starter kit to get your docs deployed and ready to customize.
+Official documentation for Rulebook Company - machine-readable market microstructure data for institutional trading desks.
 
-Click the green **Use this template** button at the top of this repo to copy the Mintlify starter kit. The starter kit contains examples with
+Real-time, structured data feeds covering exchange rules, fee schedules, and order types across 40+ equity, options, and futures venues. Built for quantitative hedge funds, market makers, and institutional traders.
 
-- Guide pages
-- Navigation
-- Customizations
-- API reference pages
-- Use of popular components
+This documentation site contains:
 
-**[Follow the full quickstart guide](https://starter.mintlify.com/quickstart)**
+- **Getting Started** - Quick integration guide and sample data
+- **User Guides** - Integration patterns for trading systems
+- **Core Concepts** - Market microstructure data explained
+- **API Reference** - Complete API documentation with examples
 
-## AI-assisted writing
-
-Set up your AI coding tool to work with Mintlify:
-
-```bash
-npx skills add https://mintlify.com/docs
-```
-
-This command installs Mintlify's documentation skill for your configured AI tools like Claude Code, Cursor, Windsurf, and others. The skill includes component reference, writing standards, and workflow guidance.
-
-See the [AI tools guides](/ai-tools) for tool-specific setup.
+**[View the live documentation](https://docs.rulebook.company)**
 
 ## Development
 
@@ -40,11 +29,15 @@ mint dev
 
 View your local preview at `http://localhost:3000`.
 
-## Publishing changes
+## Publishing Changes
 
-Install our GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app) to propagate changes from your repo to your deployment. Changes are deployed to production automatically after pushing to the default branch.
+Changes are automatically deployed to production when pushed to the `main` branch via the Mintlify GitHub App integration.
 
-## Need help?
+## Contributing
+
+We welcome contributions to improve our documentation! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+## Need Help?
 
 ### Troubleshooting
 
@@ -52,4 +45,11 @@ Install our GitHub app from your [dashboard](https://dashboard.mintlify.com/sett
 - If a page loads as a 404: Make sure you are running in a folder with a valid `docs.json`.
 
 ### Resources
-- [Mintlify documentation](https://mintlify.com/docs)
+
+- [Rulebook Company Website](https://rulebookcompany.com)
+- [Support](mailto:support@rulebook.company)
+- [Mintlify Documentation](https://mintlify.com/docs) - Platform documentation
+
+## License
+
+MIT License - See [LICENSE](LICENSE) for details.

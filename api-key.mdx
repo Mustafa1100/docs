@@ -1,0 +1,184 @@
+---
+title: "API Key"
+description: "How to obtain and manage your API credentials"
+---
+
+## Getting Your API Key
+
+To access Rulebook Company's market microstructure data, you'll need an API key.
+
+### Request Access
+
+<Steps>
+  <Step title="Contact Sales">
+    Email [support@rulebook.company](mailto:support@rulebook.company) with:
+    - Your firm name and role
+    - Use case description
+    - Expected data volume
+    - Integration timeline
+  </Step>
+
+  <Step title="Review Terms">
+    Our team will provide:
+    - Pricing information
+    - Data licensing agreement
+    - Service level agreement (SLA)
+    - Trial options for qualified firms
+  </Step>
+
+  <Step title="Receive Credentials">
+    After agreement, you'll receive:
+    - API key via secure email
+    - Access to documentation
+    - Integration support contact
+  </Step>
+</Steps>
+
+<Tip>Enterprise trials are available for qualified institutional trading firms.</Tip>
+
+## Managing Your API Key
+
+### Secure Storage
+
+**Never** hardcode API keys in your source code. Use secure storage solutions:
+
+<CodeGroup>
+
+```python Python
+# Using environment variables
+import os
+API_KEY = os.environ.get('RULEBOOK_API_KEY')
+
+# Using AWS Secrets Manager
+import boto3
+from botocore.exceptions import ClientError
+
+def get_secret():
+    secret_name = "rulebook/api_key"
+    region_name = "us-east-1"
+
+    session = boto3.session.Session()
+    client = session.client(
+        service_name='secretsmanager',
+        region_name=region_name
+    )
+
+    try:
+        get_secret_value_response = client.get_secret_value(
+            SecretId=secret_name
+        )
+    except ClientError as e:
+        raise e
+
+    return get_secret_value_response['SecretString']
+```
+
+```javascript Node.js
+// Using environment variables
+const API_KEY = process.env.RULEBOOK_API_KEY;
+
+// Using AWS Secrets Manager
+const AWS = require('aws-sdk');
+const client = new AWS.SecretsManager({
+    region: 'us-east-1'
+});
+
+async function getSecret() {
+    try {
+        const data = await client.getSecretValue({
+            SecretId: 'rulebook/api_key'
+        }).promise();
+
+        return data.SecretString;
+    } catch (err) {
+        throw err;
+    }
+}
+```
+
+```bash Shell
+# Using environment variables
+export RULEBOOK_API_KEY="your_api_key_here"
+
+# In production, use your organization's secret management
+# Examples: HashiCorp Vault, AWS Secrets Manager, etc.
+```
+
+</CodeGroup>
+
+### Security Best Practices
+
+<AccordionGroup>
+  <Accordion icon="key" title="Rotate Keys Regularly">
+    - Rotate API keys every 90 days minimum
+    - Contact support to generate new keys
+    - Implement zero-downtime key rotation in your systems
+  </Accordion>
+
+  <Accordion icon="shield" title="Use Separate Keys">
+    - Development environment: separate API key
+    - Staging environment: separate API key
+    - Production environment: separate API key
+    - Never share keys between environments
+  </Accordion>
+
+  <Accordion icon="lock" title="Restrict Access">
+    - Limit API key access to authorized personnel only
+    - Use IP whitelisting when available
+    - Monitor API usage for anomalies
+  </Accordion>
+
+  <Accordion icon="eye" title="Monitor Usage">
+    - Set up alerts for unusual API call patterns
+    - Track rate limit usage
+    - Monitor error rates
+  </Accordion>
+</AccordionGroup>
+
+## Key Rotation
+
+When rotating API keys:
+
+1. **Generate new key**: Contact support for a new API key
+2. **Update staging**: Deploy new key to staging environment
+3. **Test thoroughly**: Verify all integrations work with new key
+4. **Update production**: Deploy new key to production
+5. **Revoke old key**: Inform support to revoke the old key after 24 hours
+
+<Warning>
+If your API key is ever compromised, contact support immediately to revoke it and issue a new one.
+</Warning>
+
+## Troubleshooting
+
+Common API key issues:
+
+<AccordionGroup>
+  <Accordion icon="triangle-exclamation" title="401 Unauthorized">
+    - Check that your API key is correctly formatted
+    - Verify the Authorization header is set properly
+    - Ensure the key hasn't expired or been revoked
+  </Accordion>
+
+  <Accordion icon="gauge-high" title="429 Rate Limit Exceeded">
+    - Check your current rate limits in the dashboard
+    - Implement exponential backoff in your code
+    - Contact support to discuss higher limits
+  </Accordion>
+
+  <Accordion icon="ban" title="403 Forbidden">
+    - Verify your subscription includes access to the requested endpoint
+    - Check if IP whitelisting is configured correctly
+    - Ensure your key has the necessary permissions
+  </Accordion>
+</AccordionGroup>
+
+## Need Help?
+
+<Card
+  title="Contact Support"
+  icon="headset"
+  href="mailto:support@rulebook.company"
+>
+  Our team can help with API key management, rotation, and security best practices.
+</Card>

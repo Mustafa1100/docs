@@ -1,0 +1,66 @@
+---
+title: Authentication
+description: Learn how to authenticate with the Rulebook Company API
+---
+
+# Authentication
+
+The Rulebook Company API uses API keys to authenticate requests. You can view and manage your API keys in the [Dashboard](https://app.rulebook.company/settings/api).
+
+## API Keys
+
+Your API keys carry many privileges, so be sure to keep them secure! Do not share your secret API keys in publicly accessible areas such as GitHub, client-side code, and so forth.
+
+<Warning>
+  Keep your API keys secure and never commit them to version control.
+</Warning>
+
+## Authentication Method
+
+Authentication to the API is performed via Bearer token in the request header. Provide your API key in the `Authorization` header:
+
+```bash
+curl https://api.rulebook.company/v1/endpoint \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+## Request Format
+
+All API requests must be made over HTTPS. Calls made over plain HTTP will fail.
+
+```json
+{
+  "headers": {
+    "Authorization": "Bearer YOUR_API_KEY",
+    "Content-Type": "application/json"
+  }
+}
+```
+
+## Security Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Rotate Keys Regularly" icon="rotate">
+    Update your API keys periodically to maintain security
+  </Card>
+  <Card title="Use Environment Variables" icon="lock">
+    Store API keys in environment variables, never in code
+  </Card>
+  <Card title="Limit Key Scope" icon="shield">
+    Create separate keys for different environments
+  </Card>
+  <Card title="Monitor Usage" icon="chart-line">
+    Track API key usage in your dashboard
+  </Card>
+</CardGroup>
+
+## Getting Your API Key
+
+1. Log in to your [Dashboard](https://app.rulebook.company)
+2. Navigate to Settings → API Keys
+3. Click "Create New API Key"
+4. Copy your key and store it securely
+
+<Tip>
+  You can create multiple API keys for different applications or environments.
+</Tip>
