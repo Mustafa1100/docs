@@ -98,11 +98,5 @@
   "layout": {
     "default": "topnav"
   },
-  "footer": {
-    "socials": {
-      "x": "https://x.com/rulebookco",
-      "github": "https://github.com/rulebook-company",
-      "linkedin": "https://linkedin.com/company/rulebook-company"
-    }
-  }
+  "footer": {}
 }
