@@ -1,0 +1,216 @@
+---
+title: 'Get Available Fee Categories'
+description: 'Retrieve available fee categories for a specific exchange'
+api: 'GET /api/v1/suppliers/{supplier_name}/fee-categories'
+---
+
+## Overview
+
+This endpoint returns all available fee categories for a specific exchange/supplier. Use this to discover which fee categories have data available before making detailed data requests.
+
+<Note>
+  **Authorization Required** - You must include a valid Bearer token in the Authorization header. Contact [sales@rulebook.company](mailto:sales@rulebook.company) to obtain API access.
+</Note>
+
+## Path Parameters
+
+<ParamField path="supplier_name" type="string" required>
+  The name or code of the supplier (e.g., NYSE, NASDAQ, CBOE)
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="start_date" type="string">
+  Optional: Filter by start date (ISO 8601 format: YYYY-MM-DD)
+</ParamField>
+
+<ParamField query="end_date" type="string">
+  Optional: Filter by end date (ISO 8601 format: YYYY-MM-DD)
+</ParamField>
+
+## Request
+
+```bash
+curl -X GET https://api.rulebook.company/v1/suppliers/NYSE/fee-categories \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json"
+```
+
+### With Date Range Filter
+
+```bash
+curl -X GET "https://api.rulebook.company/v1/suppliers/NYSE/fee-categories?start_date=2024-01-01&end_date=2024-12-31" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json"
+```
+
+## Response
+
+<ResponseField name="supplier" type="string">
+  Name of the supplier
+</ResponseField>
+
+<ResponseField name="date_range" type="object">
+  Date range filter applied (if any)
+
+  <Expandable title="Date Range">
+    <ResponseField name="start_date" type="string">
+      Start date filter
+    </ResponseField>
+    <ResponseField name="end_date" type="string">
+      End date filter
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="fee_categories" type="array">
+  Array of available fee category objects
+
+  <Expandable title="Fee Category Object">
+    <ResponseField name="category" type="string">
+      Fee category identifier
+    </ResponseField>
+
+    <ResponseField name="display_name" type="string">
+      Human-readable name for the category
+    </ResponseField>
+
+    <ResponseField name="description" type="string">
+      Description of what this category includes
+    </ResponseField>
+
+    <ResponseField name="available" type="boolean">
+      Whether this category currently has data available
+    </ResponseField>
+
+    <ResponseField name="record_count" type="integer">
+      Number of records available for this category
+    </ResponseField>
+
+    <ResponseField name="applicable_fee_types" type="array">
+      Array of fee types this category applies to
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "supplier": "NYSE",
+    "date_range": null,
+    "fee_categories": [
+      {
+        "category": "Fee And Rebates",
+        "display_name": "Fee And Rebates",
+        "description": "Standard trading fees and liquidity rebates",
+        "available": true,
+        "record_count": 12500,
+        "applicable_fee_types": ["equity", "option"]
+      },
+      {
+        "category": "Legal Regulatory Fees",
+        "display_name": "Legal & Regulatory Fees",
+        "description": "SEC fees, FINRA fees, and other regulatory charges",
+        "available": true,
+        "record_count": 3200,
+        "applicable_fee_types": ["equity", "option"]
+      },
+      {
+        "category": "Market Data Fees",
+        "display_name": "Market Data Fees",
+        "description": "Real-time and delayed market data subscription fees",
+        "available": true,
+        "record_count": 1850,
+        "applicable_fee_types": ["equity", "option"]
+      },
+      {
+        "category": "Participant Fee",
+        "display_name": "Participant Fees",
+        "description": "Membership and participation fees",
+        "available": true,
+        "record_count": 960,
+        "applicable_fee_types": ["equity", "option"]
+      },
+      {
+        "category": "Port Fees And Other Services",
+        "display_name": "Port Fees And Other Services",
+        "description": "Connection fees, ports, and additional services",
+        "available": true,
+        "record_count": 2400,
+        "applicable_fee_types": ["equity", "option"]
+      }
+    ],
+    "total_categories": 5
+  }
+}
+```
+
+## Fee Category Details
+
+<AccordionGroup>
+  <Accordion title="Fee And Rebates">
+    Standard trading fees charged for taking liquidity and rebates paid for providing liquidity to the order book.
+  </Accordion>
+
+  <Accordion title="Legal Regulatory Fees">
+    Regulatory charges including:
+    - SEC Section 31 fees
+    - FINRA Trading Activity Fee (TAF)
+    - Other regulatory assessments
+  </Accordion>
+
+  <Accordion title="Market Data Fees">
+    Fees for market data access including:
+    - Real-time quotes and trades
+    - Delayed market data
+    - Historical data access
+    - Data redistribution fees
+  </Accordion>
+
+  <Accordion title="Participant Fee">
+    Membership and participation related fees:
+    - Annual membership fees
+    - Trading permit fees
+    - Market maker registration fees
+  </Accordion>
+
+  <Accordion title="Port Fees And Other Services">
+    Infrastructure and additional service fees:
+    - Network connectivity fees
+    - Port and connection fees
+    - Co-location services
+    - Testing environment access
+  </Accordion>
+</AccordionGroup>
+
+## Error Responses
+
+<ResponseExample>
+```json 400 Bad Request
+{
+  "error": "Bad Request",
+  "message": "Invalid date format",
+  "details": {
+    "field": "start_date",
+    "expected_format": "YYYY-MM-DD"
+  }
+}
+```
+
+```json 401 Unauthorized
+{
+  "error": "Unauthorized",
+  "message": "Invalid or missing API key"
+}
+```
+
+```json 404 Not Found
+{
+  "error": "Not Found",
+  "message": "Supplier not found"
+}
+```
+</ResponseExample>

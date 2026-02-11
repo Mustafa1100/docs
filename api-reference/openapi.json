@@ -1,16 +1,14 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "OpenAPI Plant Store",
-    "description": "A sample API that uses a plant store as an example to demonstrate features in the OpenAPI specification",
-    "license": {
-      "name": "MIT"
-    },
-    "version": "1.0.0"
+    "title": "Rulebook Company API",
+    "version": "1.0.0",
+    "description": "API for accessing exchange fee and rebate data across multiple trading venues"
   },
   "servers": [
     {
-      "url": "http://sandbox.mintlify.com"
+      "url": "https://api.rulebook.company/v1",
+      "description": "Production server"
     }
   ],
   "security": [
@@ -18,37 +16,561 @@
       "bearerAuth": []
     }
   ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "API Key",
+        "description": "Contact sales@rulebook.company to obtain your API authorization token"
+      }
+    },
+    "schemas": {
+      "SupplierDataRequest": {
+        "type": "object",
+        "required": ["supplier_name", "fee_type", "fee_category", "action", "participant"],
+        "properties": {
+          "supplier_name": {
+            "type": "string",
+            "description": "Name or code of the supplier (e.g., NYSE, NASDAQ, CBOE)",
+            "example": "NYSE"
+          },
+          "fee_type": {
+            "type": "string",
+            "enum": ["option", "equity"],
+            "description": "Type of fee to retrieve: option (Options trading fees) or equity (Equity trading fees)",
+            "example": "equity"
+          },
+          "fee_category": {
+            "type": "string",
+            "enum": [
+              "Fee And Rebates",
+              "Legal Regulatory Fees",
+              "Market Data Fees",
+              "Participant Fee",
+              "Port Fees And Other Services"
+            ],
+            "description": "Category of fees to retrieve",
+            "example": "Fee And Rebates"
+          },
+          "action": {
+            "type": "string",
+            "enum": ["Make", "Take", "Open", "Routed & Other"],
+            "description": "Trading action type: Make (liquidity providing), Take (liquidity taking), Open (opening transactions), or Routed & Other",
+            "example": "Make"
+          },
+          "participant": {
+            "type": "string",
+            "enum": [
+              "All",
+              "Away Market Maker",
+              "Market Maker",
+              "Broker Dealer",
+              "Customer",
+              "Firm",
+              "Professional & Other"
+            ],
+            "description": "Participant type for the data",
+            "example": "Market Maker"
+          },
+          "start_date": {
+            "type": "string",
+            "format": "date",
+            "description": "Start date for data retrieval (YYYY-MM-DD)",
+            "example": "2024-01-01"
+          },
+          "end_date": {
+            "type": "string",
+            "format": "date",
+            "description": "End date for data retrieval (YYYY-MM-DD)",
+            "example": "2024-12-31"
+          }
+        }
+      },
+      "Exchange": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the exchange"
+          },
+          "name": {
+            "type": "string",
+            "description": "Full name of the exchange"
+          },
+          "code": {
+            "type": "string",
+            "description": "Exchange code (e.g., NYSE, NASDAQ)"
+          },
+          "country": {
+            "type": "string",
+            "description": "Country where the exchange is located"
+          },
+          "status": {
+            "type": "string",
+            "description": "Status of the exchange (active, inactive)"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "details": {
+            "type": "object"
+          }
+        }
+      }
+    }
+  },
   "paths": {
-    "/plants": {
+    "/exchanges": {
       "get": {
-        "description": "Returns all plants from the system that the user has access to",
+        "summary": "List All Exchanges",
+        "description": "Retrieve a list of all available exchanges in the Rulebook Company database",
+        "operationId": "listExchanges",
+        "tags": ["Discovery Endpoints"],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "exchanges": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Exchange"
+                          }
+                        }
+                      }
+                    },
+                    "count": {
+                      "type": "integer",
+                      "example": 2
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/suppliers/{supplier_name}/date-ranges": {
+      "get": {
+        "summary": "Check Available Date Ranges",
+        "description": "Get available date ranges for a specific supplier to determine what time periods have data available",
+        "operationId": "getDateRanges",
+        "tags": ["Discovery Endpoints"],
         "parameters": [
           {
-            "name": "limit",
-            "in": "query",
-            "description": "The maximum number of results to return",
+            "name": "supplier_name",
+            "in": "path",
+            "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
+              "type": "string"
+            },
+            "description": "The name or code of the supplier (e.g., NYSE, NASDAQ, CBOE)",
+            "example": "NYSE"
           }
         ],
         "responses": {
           "200": {
-            "description": "Plant response",
+            "description": "Successful response"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Supplier not found"
+          }
+        }
+      }
+    },
+    "/suppliers/{supplier_name}/fee-types": {
+      "get": {
+        "summary": "Get Available Fee Types",
+        "description": "Retrieve available fee types (option/equity) for a specific exchange",
+        "operationId": "getFeeTypes",
+        "tags": ["Discovery Endpoints"],
+        "parameters": [
+          {
+            "name": "supplier_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The name or code of the supplier",
+            "example": "NYSE"
+          },
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Filter by start date (YYYY-MM-DD)"
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Filter by end date (YYYY-MM-DD)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Supplier not found"
+          }
+        }
+      }
+    },
+    "/suppliers/{supplier_name}/fee-categories": {
+      "get": {
+        "summary": "Get Available Fee Categories",
+        "description": "Retrieve available fee categories for a specific exchange",
+        "operationId": "getFeeCategories",
+        "tags": ["Discovery Endpoints"],
+        "parameters": [
+          {
+            "name": "supplier_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The name or code of the supplier",
+            "example": "NYSE"
+          },
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Filter by start date (YYYY-MM-DD)"
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Filter by end date (YYYY-MM-DD)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Supplier not found"
+          }
+        }
+      }
+    },
+    "/suppliers/{supplier_name}/actions": {
+      "get": {
+        "summary": "Get Available Actions",
+        "description": "Retrieve available trading action types for a specific exchange",
+        "operationId": "getActions",
+        "tags": ["Discovery Endpoints"],
+        "parameters": [
+          {
+            "name": "supplier_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The name or code of the supplier",
+            "example": "NYSE"
+          },
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Filter by start date (YYYY-MM-DD)"
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Filter by end date (YYYY-MM-DD)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Supplier not found"
+          }
+        }
+      }
+    },
+    "/suppliers/{supplier_name}/participants": {
+      "get": {
+        "summary": "Get Available Participants",
+        "description": "Retrieve available participant types for a specific exchange",
+        "operationId": "getParticipants",
+        "tags": ["Discovery Endpoints"],
+        "parameters": [
+          {
+            "name": "supplier_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The name or code of the supplier",
+            "example": "NYSE"
+          },
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Filter by start date (YYYY-MM-DD)"
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Filter by end date (YYYY-MM-DD)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Supplier not found"
+          }
+        }
+      }
+    },
+    "/suppliers/data": {
+      "post": {
+        "summary": "Get Supplier Data",
+        "description": "Retrieve detailed supplier data with customizable filters including supplier name, fee type, fee category, action type, and participant type",
+        "operationId": "getSupplierData",
+        "tags": ["Data Endpoints"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SupplierDataRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Plant"
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "supplier": {
+                          "type": "string",
+                          "example": "NYSE"
+                        },
+                        "fee_type": {
+                          "type": "string",
+                          "example": "equity"
+                        },
+                        "fee_category": {
+                          "type": "string",
+                          "example": "Fee And Rebates"
+                        },
+                        "action": {
+                          "type": "string",
+                          "example": "Make"
+                        },
+                        "participant": {
+                          "type": "string",
+                          "example": "Market Maker"
+                        },
+                        "date_range": {
+                          "type": "object",
+                          "properties": {
+                            "start": {
+                              "type": "string",
+                              "example": "2024-01-01T00:00:00Z"
+                            },
+                            "end": {
+                              "type": "string",
+                              "example": "2024-12-31T23:59:59Z"
+                            }
+                          }
+                        },
+                        "records": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "date": {
+                                "type": "string",
+                                "example": "2024-01-01"
+                              },
+                              "fee_amount": {
+                                "type": "number",
+                                "example": 0.0015
+                              },
+                              "rebate_amount": {
+                                "type": "number",
+                                "example": 0.0020
+                              },
+                              "volume": {
+                                "type": "number",
+                                "example": 150000
+                              },
+                              "description": {
+                                "type": "string",
+                                "example": "Market maker rebate for providing liquidity"
+                              }
+                            }
+                          }
+                        },
+                        "total_records": {
+                          "type": "integer",
+                          "example": 365
+                        },
+                        "summary": {
+                          "type": "object",
+                          "properties": {
+                            "total_fees": {
+                              "type": "number",
+                              "example": 547.50
+                            },
+                            "total_rebates": {
+                              "type": "number",
+                              "example": 730.00
+                            },
+                            "net_amount": {
+                              "type": "number",
+                              "example": 182.50
+                            },
+                            "total_volume": {
+                              "type": "number",
+                              "example": 54750000
+                            }
+                          }
+                        }
+                      }
+                    }
                   }
                 }
               }
             }
           },
           "400": {
-            "description": "Unexpected error",
+            "description": "Bad Request - Invalid parameter value",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - No data found for the specified parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity - Required fields missing",
             "content": {
               "application/json": {
                 "schema": {
@@ -58,159 +580,6 @@
             }
           }
         }
-      },
-      "post": {
-        "description": "Creates a new plant in the store",
-        "requestBody": {
-          "description": "Plant to add to the store",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NewPlant"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "plant response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Plant"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/plants/{id}": {
-      "delete": {
-        "description": "Deletes a single plant based on the ID supplied",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "ID of plant to delete",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Plant deleted",
-            "content": {}
-          },
-          "400": {
-            "description": "unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  },
-  "webhooks": {
-    "/plant/webhook": {
-      "post": {
-        "description": "Information about a new plant added to the store",
-        "requestBody": {
-          "description": "Plant added to the store",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NewPlant"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Return a 200 status to indicate that the data was received successfully"
-          }
-        }
-      }
-    }
-  },
-  "components": {
-    "schemas": {
-      "Plant": {
-        "required": [
-          "name"
-        ],
-        "type": "object",
-        "properties": {
-          "name": {
-            "description": "The name of the plant",
-            "type": "string"
-          },
-          "tag": {
-            "description": "Tag to specify the type",
-            "type": "string"
-          }
-        }
-      },
-      "NewPlant": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Plant"
-          },
-          {
-            "required": [
-              "id"
-            ],
-            "type": "object",
-            "properties": {
-              "id": {
-                "description": "Identification number of the plant",
-                "type": "integer",
-                "format": "int64"
-              }
-            }
-          }
-        ]
-      },
-      "Error": {
-        "required": [
-          "error",
-          "message"
-        ],
-        "type": "object",
-        "properties": {
-          "error": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "message": {
-            "type": "string"
-          }
-        }
-      }
-    },
-    "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer"
       }
     }
   }

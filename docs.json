@@ -34,7 +34,7 @@
         ]
       },
       {
-        "tab": "API Reference",
+        "tab": "API References",
         "groups": [
           {
             "group": "Overview",
@@ -44,11 +44,15 @@
             ]
           },
           {
-            "group": "Endpoints",
+            "group": "API Endpoints",
             "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete"
+              "api-reference/endpoint/list-exchanges",
+              "api-reference/endpoint/date-ranges",
+              "api-reference/endpoint/fee-types",
+              "api-reference/endpoint/fee-categories",
+              "api-reference/endpoint/actions",
+              "api-reference/endpoint/participants",
+              "api-reference/endpoint/supplier-data"
             ]
           }
         ]

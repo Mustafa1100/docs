@@ -1,0 +1,152 @@
+---
+title: 'Get Available Fee Types'
+description: 'Retrieve available fee types for a specific exchange'
+api: 'GET /api/v1/suppliers/{supplier_name}/fee-types'
+---
+
+## Overview
+
+This endpoint returns all available fee types for a specific exchange/supplier. Use this to discover which fee types (option or equity) have data available before making detailed data requests.
+
+<Note>
+  **Authorization Required** - You must include a valid Bearer token in the Authorization header. Contact [sales@rulebook.company](mailto:sales@rulebook.company) to obtain API access.
+</Note>
+
+## Path Parameters
+
+<ParamField path="supplier_name" type="string" required>
+  The name or code of the supplier (e.g., NYSE, NASDAQ, CBOE)
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="start_date" type="string">
+  Optional: Filter by start date (ISO 8601 format: YYYY-MM-DD)
+</ParamField>
+
+<ParamField query="end_date" type="string">
+  Optional: Filter by end date (ISO 8601 format: YYYY-MM-DD)
+</ParamField>
+
+## Request
+
+```bash
+curl -X GET https://api.rulebook.company/v1/suppliers/NYSE/fee-types \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json"
+```
+
+## Response
+
+<ResponseField name="supplier" type="string">
+  Name of the supplier
+</ResponseField>
+
+<ResponseField name="date_range" type="object">
+  Date range filter applied (if any)
+
+  <Expandable title="Date Range">
+    <ResponseField name="start_date" type="string">
+      Start date filter
+    </ResponseField>
+    <ResponseField name="end_date" type="string">
+      End date filter
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="fee_types" type="array">
+  Array of available fee type objects
+
+  <Expandable title="Fee Type Object">
+    <ResponseField name="type" type="string">
+      Fee type identifier (option, equity)
+    </ResponseField>
+
+    <ResponseField name="display_name" type="string">
+      Human-readable name for the fee type
+    </ResponseField>
+
+    <ResponseField name="description" type="string">
+      Description of what this fee type covers
+    </ResponseField>
+
+    <ResponseField name="available" type="boolean">
+      Whether this fee type currently has data available
+    </ResponseField>
+
+    <ResponseField name="record_count" type="integer">
+      Number of records available for this fee type
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "supplier": "NYSE",
+    "date_range": null,
+    "fee_types": [
+      {
+        "type": "equity",
+        "display_name": "Equity",
+        "description": "Fees and rebates for equity securities trading",
+        "available": true,
+        "record_count": 15420
+      },
+      {
+        "type": "option",
+        "display_name": "Options",
+        "description": "Fees and rebates for options trading",
+        "available": true,
+        "record_count": 8750
+      }
+    ],
+    "total_types": 2
+  }
+}
+```
+
+## Error Responses
+
+<ResponseExample>
+```json 401 Unauthorized
+{
+  "error": "Unauthorized",
+  "message": "Invalid or missing API key"
+}
+```
+
+```json 404 Not Found
+{
+  "error": "Not Found",
+  "message": "Supplier not found"
+}
+```
+</ResponseExample>
+
+## Usage Example
+
+<Tip>
+  Use this endpoint before querying detailed data to ensure the fee type you need is available for the supplier.
+</Tip>
+
+```javascript
+// Example: Check available fee types before querying data
+const response = await fetch('https://api.rulebook.company/v1/suppliers/NYSE/fee-types', {
+  headers: {
+    'Authorization': 'Bearer YOUR_API_KEY',
+    'Content-Type': 'application/json'
+  }
+});
+
+const { data } = await response.json();
+const hasEquity = data.fee_types.some(ft => ft.type === 'equity' && ft.available);
+
+if (hasEquity) {
+  // Proceed to query equity data
+}
+```

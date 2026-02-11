@@ -1,33 +1,94 @@
 ---
 title: 'Introduction'
-description: 'Example section for showcasing API endpoints'
+description: 'Get started with the Rulebook Company API for exchange fee and rebate data'
 ---
 
+## Welcome to Rulebook Company API
+
+The Rulebook Company API provides programmatic access to comprehensive exchange fee, rebate, and regulatory data across multiple trading venues. Our API enables you to retrieve historical and current fee schedules, analyze trading costs, and integrate exchange fee data into your applications.
+
 <Note>
-  If you're not looking to build API reference documentation, you can delete
-  this section by removing the api-reference folder.
+  **Get API Access** - To start using the Rulebook Company API, you need to contact our sales team to obtain your authorization token. Reach out at [sales@rulebook.company](mailto:sales@rulebook.company) or visit our [website](https://rulebookcompany.com/contact).
 </Note>
 
-## Welcome
+## Base URL
 
-There are two ways to build API documentation: [OpenAPI](https://mintlify.com/docs/api-playground/openapi/setup) and [MDX components](https://mintlify.com/docs/api-playground/mdx/configuration). For the starter kit, we are using the following OpenAPI specification.
+All API requests should be made to:
 
-<Card
-  title="Plant Store Endpoints"
-  icon="leaf"
-  href="https://github.com/mintlify/starter/blob/main/api-reference/openapi.json"
->
-  View the OpenAPI specification file
-</Card>
+```
+https://api.rulebook.company/v1
+```
+
+## Available Endpoints
+
+### Discovery Endpoints
+Explore what data is available before making detailed queries.
+
+<CardGroup cols={2}>
+  <Card title="List Exchanges" icon="building-columns" href="/api-reference/endpoint/list-exchanges">
+    Get all available exchanges in the database
+  </Card>
+  <Card title="Check Date Ranges" icon="calendar-range" href="/api-reference/endpoint/date-ranges">
+    Verify available date ranges for specific suppliers
+  </Card>
+  <Card title="Get Fee Types" icon="layer-group" href="/api-reference/endpoint/fee-types">
+    Discover available fee types (option/equity) for an exchange
+  </Card>
+  <Card title="Get Fee Categories" icon="tags" href="/api-reference/endpoint/fee-categories">
+    See available fee categories for an exchange
+  </Card>
+  <Card title="Get Actions" icon="bolt" href="/api-reference/endpoint/actions">
+    View available trading actions (Make, Take, etc.)
+  </Card>
+  <Card title="Get Participants" icon="users" href="/api-reference/endpoint/participants">
+    Check available participant types for an exchange
+  </Card>
+</CardGroup>
+
+### Data Endpoints
+Retrieve detailed fee and rebate data.
+
+<CardGroup cols={1}>
+  <Card title="Supplier Data" icon="database" href="/api-reference/endpoint/supplier-data">
+    Get detailed supplier data with customizable filters
+  </Card>
+</CardGroup>
 
 ## Authentication
 
-All API endpoints are authenticated using Bearer tokens and picked up from the specification file.
+All API endpoints require authentication using Bearer tokens. You must include your API key in the Authorization header of every request.
 
-```json
-"security": [
-  {
-    "bearerAuth": []
-  }
-]
+```bash
+curl https://api.rulebook.company/v1/exchanges \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json"
 ```
+
+Learn more about authentication in the [Authentication](/api-reference/authentication) section.
+
+## Data Coverage
+
+Our API provides access to:
+
+- **Fee Types**: Options and Equity trading fees
+- **Fee Categories**:
+  - Fee And Rebates
+  - Legal Regulatory Fees
+  - Market Data Fees
+  - Participant Fees
+  - Port Fees And Other Services
+- **Actions**: Make, Take, Open, Routed & Other
+- **Participants**: Market Makers, Broker Dealers, Customers, Firms, and more
+
+## Rate Limits
+
+<Info>
+  Rate limits are applied per API key. Contact sales for information about rate limits for your plan.
+</Info>
+
+## Support
+
+Need help with the API? Contact our support team:
+- Email: [support@rulebook.company](mailto:support@rulebook.company)
+- Sales: [sales@rulebook.company](mailto:sales@rulebook.company)
+- Website: [https://rulebookcompany.com](https://rulebookcompany.com)

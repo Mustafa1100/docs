@@ -1,0 +1,273 @@
+---
+title: 'Get Supplier Data'
+description: 'Retrieve detailed supplier data based on multiple parameters'
+api: 'POST /api/v1/suppliers/data'
+---
+
+## Overview
+
+This endpoint retrieves detailed supplier data based on customizable parameters including supplier name, fee type, fee category, action type, and participant type.
+
+<Note>
+  **Authorization Required** - You must include a valid Bearer token in the Authorization header. Contact [sales@rulebook.company](mailto:sales@rulebook.company) to obtain API access.
+</Note>
+
+## Request Body
+
+<ParamField body="supplier_name" type="string" required>
+  Name or code of the supplier (e.g., NYSE, NASDAQ, CBOE)
+</ParamField>
+
+<ParamField body="fee_type" type="string" required>
+  Type of fee to retrieve
+  - `option` - Options trading fees
+  - `equity` - Equity trading fees
+</ParamField>
+
+<ParamField body="fee_category" type="string" required>
+  Category of fees to retrieve
+  - `Fee And Rebates`
+  - `Legal Regulatory Fees`
+  - `Market Data Fees`
+  - `Participant Fee`
+  - `Port Fees And Other Services`
+</ParamField>
+
+<ParamField body="action" type="string" required>
+  Trading action type
+  - `Make` - Liquidity providing orders
+  - `Take` - Liquidity taking orders
+  - `Open` - Opening transactions
+  - `Routed & Other` - Routed orders and other actions
+</ParamField>
+
+<ParamField body="participant" type="string" required>
+  Participant type for the data
+  - `All` - All participant types
+  - `Away Market Maker` - Market makers from other exchanges
+  - `Market Maker` - Exchange market makers
+  - `Broker Dealer` - Broker-dealer firms
+  - `Customer` - Retail and institutional customers
+  - `Firm` - Proprietary trading firms
+  - `Professional & Other` - Professional traders and other categories
+</ParamField>
+
+<ParamField body="start_date" type="string">
+  Start date for data retrieval (ISO 8601 format: YYYY-MM-DD)
+</ParamField>
+
+<ParamField body="end_date" type="string">
+  End date for data retrieval (ISO 8601 format: YYYY-MM-DD)
+</ParamField>
+
+## Request Example
+
+```bash
+curl -X POST https://api.rulebook.company/v1/suppliers/data \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "supplier_name": "NYSE",
+    "fee_type": "equity",
+    "fee_category": "Fee And Rebates",
+    "action": "Make",
+    "participant": "Market Maker",
+    "start_date": "2024-01-01",
+    "end_date": "2024-12-31"
+  }'
+```
+
+## Response
+
+<ResponseField name="success" type="boolean">
+  Indicates if the request was successful
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  Container for the response data
+
+  <Expandable title="Data Object">
+    <ResponseField name="supplier" type="string">
+      Name of the supplier
+    </ResponseField>
+
+    <ResponseField name="fee_type" type="string">
+      Type of fee (option/equity)
+    </ResponseField>
+
+    <ResponseField name="fee_category" type="string">
+      Category of fees
+    </ResponseField>
+
+    <ResponseField name="action" type="string">
+      Trading action type
+    </ResponseField>
+
+    <ResponseField name="participant" type="string">
+      Participant type
+    </ResponseField>
+
+    <ResponseField name="date_range" type="object">
+      Date range for the data
+      <Expandable title="Date Range">
+        <ResponseField name="start" type="string">
+          Start date (ISO 8601)
+        </ResponseField>
+        <ResponseField name="end" type="string">
+          End date (ISO 8601)
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+
+    <ResponseField name="records" type="array">
+      Array of fee records
+      <Expandable title="Fee Record">
+        <ResponseField name="date" type="string">
+          Date of the fee record
+        </ResponseField>
+        <ResponseField name="fee_amount" type="number">
+          Fee amount in dollars
+        </ResponseField>
+        <ResponseField name="rebate_amount" type="number">
+          Rebate amount in dollars (if applicable)
+        </ResponseField>
+        <ResponseField name="volume" type="number">
+          Trading volume associated with the fee
+        </ResponseField>
+        <ResponseField name="description" type="string">
+          Description of the fee/rebate
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+
+    <ResponseField name="total_records" type="integer">
+      Total number of records returned
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "supplier": "NYSE",
+    "fee_type": "equity",
+    "fee_category": "Fee And Rebates",
+    "action": "Make",
+    "participant": "Market Maker",
+    "date_range": {
+      "start": "2024-01-01T00:00:00Z",
+      "end": "2024-12-31T23:59:59Z"
+    },
+    "records": [
+      {
+        "date": "2024-01-01",
+        "fee_amount": 0.0015,
+        "rebate_amount": 0.0020,
+        "volume": 150000,
+        "description": "Market maker rebate for providing liquidity"
+      },
+      {
+        "date": "2024-01-02",
+        "fee_amount": 0.0015,
+        "rebate_amount": 0.0020,
+        "volume": 175000,
+        "description": "Market maker rebate for providing liquidity"
+      }
+    ],
+    "total_records": 365,
+    "summary": {
+      "total_fees": 547.50,
+      "total_rebates": 730.00,
+      "net_amount": 182.50,
+      "total_volume": 54750000
+    }
+  }
+}
+```
+
+## Parameter Combinations
+
+<AccordionGroup>
+  <Accordion title="Fee Type Options">
+    - **option**: Options trading fees and rebates
+    - **equity**: Equity trading fees and rebates
+  </Accordion>
+
+  <Accordion title="Fee Category Options">
+    - **Fee And Rebates**: Standard trading fees and liquidity rebates
+    - **Legal Regulatory Fees**: SEC fees, FINRA fees, and other regulatory charges
+    - **Market Data Fees**: Real-time and delayed market data subscription fees
+    - **Participant Fee**: Membership and participation fees
+    - **Port Fees And Other Services**: Connection fees, ports, and additional services
+  </Accordion>
+
+  <Accordion title="Action Types">
+    - **Make**: Orders that add liquidity to the order book
+    - **Take**: Orders that remove liquidity from the order book
+    - **Open**: Opening auction transactions
+    - **Routed & Other**: Orders routed to other venues and miscellaneous actions
+  </Accordion>
+
+  <Accordion title="Participant Types">
+    - **All**: Aggregated data across all participant types
+    - **Away Market Maker**: Market makers from other exchanges
+    - **Market Maker**: Exchange-designated market makers
+    - **Broker Dealer**: Registered broker-dealer firms
+    - **Customer**: Retail and institutional customers
+    - **Firm**: Proprietary trading firms
+    - **Professional & Other**: Professional traders and other categories
+  </Accordion>
+</AccordionGroup>
+
+## Error Responses
+
+<ResponseExample>
+```json 400 Bad Request
+{
+  "error": "Bad Request",
+  "message": "Invalid parameter value",
+  "details": {
+    "field": "fee_type",
+    "provided": "invalid_type",
+    "allowed": ["option", "equity"]
+  }
+}
+```
+
+```json 401 Unauthorized
+{
+  "error": "Unauthorized",
+  "message": "Invalid or missing API key"
+}
+```
+
+```json 404 Not Found
+{
+  "error": "Not Found",
+  "message": "No data found for the specified parameters"
+}
+```
+
+```json 422 Unprocessable Entity
+{
+  "error": "Validation Error",
+  "message": "Required fields missing",
+  "details": {
+    "missing_fields": ["supplier_name", "fee_type"]
+  }
+}
+```
+</ResponseExample>
+
+## Usage Tips
+
+<Tip>
+  Use the [Check Available Date Ranges](/api-reference/endpoint/date-ranges) endpoint first to ensure data is available for your requested time period.
+</Tip>
+
+<Warning>
+  Large date ranges may result in slower response times. Consider paginating requests for date ranges exceeding 6 months.
+</Warning>

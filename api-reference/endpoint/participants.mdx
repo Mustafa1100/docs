@@ -1,0 +1,280 @@
+---
+title: 'Get Available Participants'
+description: 'Retrieve available participant types for a specific exchange'
+api: 'GET /api/v1/suppliers/{supplier_name}/participants'
+---
+
+## Overview
+
+This endpoint returns all available participant types for a specific exchange/supplier. Use this to discover which participant types have data available before making detailed data requests.
+
+<Note>
+  **Authorization Required** - You must include a valid Bearer token in the Authorization header. Contact [sales@rulebook.company](mailto:sales@rulebook.company) to obtain API access.
+</Note>
+
+## Path Parameters
+
+<ParamField path="supplier_name" type="string" required>
+  The name or code of the supplier (e.g., NYSE, NASDAQ, CBOE)
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="start_date" type="string">
+  Optional: Filter by start date (ISO 8601 format: YYYY-MM-DD)
+</ParamField>
+
+<ParamField query="end_date" type="string">
+  Optional: Filter by end date (ISO 8601 format: YYYY-MM-DD)
+</ParamField>
+
+## Request
+
+```bash
+curl -X GET https://api.rulebook.company/v1/suppliers/NYSE/participants \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json"
+```
+
+### With Date Range Filter
+
+```bash
+curl -X GET "https://api.rulebook.company/v1/suppliers/NYSE/participants?start_date=2024-01-01&end_date=2024-12-31" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json"
+```
+
+## Response
+
+<ResponseField name="supplier" type="string">
+  Name of the supplier
+</ResponseField>
+
+<ResponseField name="date_range" type="object">
+  Date range filter applied (if any)
+
+  <Expandable title="Date Range">
+    <ResponseField name="start_date" type="string">
+      Start date filter
+    </ResponseField>
+    <ResponseField name="end_date" type="string">
+      End date filter
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="participants" type="array">
+  Array of available participant objects
+
+  <Expandable title="Participant Object">
+    <ResponseField name="participant" type="string">
+      Participant type identifier
+    </ResponseField>
+
+    <ResponseField name="display_name" type="string">
+      Human-readable name for the participant type
+    </ResponseField>
+
+    <ResponseField name="description" type="string">
+      Description of this participant type
+    </ResponseField>
+
+    <ResponseField name="available" type="boolean">
+      Whether this participant type currently has data available
+    </ResponseField>
+
+    <ResponseField name="record_count" type="integer">
+      Number of records available for this participant type
+    </ResponseField>
+
+    <ResponseField name="typical_fee_structure" type="string">
+      General fee structure for this participant type
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "supplier": "NYSE",
+    "date_range": null,
+    "participants": [
+      {
+        "participant": "All",
+        "display_name": "All Participants",
+        "description": "Aggregated data across all participant types",
+        "available": true,
+        "record_count": 18500,
+        "typical_fee_structure": "Aggregated"
+      },
+      {
+        "participant": "Market Maker",
+        "display_name": "Market Maker",
+        "description": "Exchange-designated market makers with obligations",
+        "available": true,
+        "record_count": 4250,
+        "typical_fee_structure": "Enhanced rebates"
+      },
+      {
+        "participant": "Away Market Maker",
+        "display_name": "Away Market Maker",
+        "description": "Market makers from other exchanges",
+        "available": true,
+        "record_count": 3100,
+        "typical_fee_structure": "Standard rebates"
+      },
+      {
+        "participant": "Broker Dealer",
+        "display_name": "Broker Dealer",
+        "description": "Registered broker-dealer firms",
+        "available": true,
+        "record_count": 5680,
+        "typical_fee_structure": "Standard fees"
+      },
+      {
+        "participant": "Customer",
+        "display_name": "Customer",
+        "description": "Retail and institutional customers",
+        "available": true,
+        "record_count": 2840,
+        "typical_fee_structure": "Reduced fees"
+      },
+      {
+        "participant": "Firm",
+        "display_name": "Firm",
+        "description": "Proprietary trading firms",
+        "available": true,
+        "record_count": 1950,
+        "typical_fee_structure": "Standard fees"
+      },
+      {
+        "participant": "Professional & Other",
+        "display_name": "Professional & Other",
+        "description": "Professional traders and other categories",
+        "available": true,
+        "record_count": 1420,
+        "typical_fee_structure": "Variable"
+      }
+    ],
+    "total_participants": 7
+  }
+}
+```
+
+## Participant Type Details
+
+<AccordionGroup>
+  <Accordion title="All Participants">
+    **All** represents aggregated data across all participant types.
+
+    - Combined statistics
+    - Overall market activity
+    - Useful for macro analysis
+    - Includes all participant categories
+  </Accordion>
+
+  <Accordion title="Market Maker">
+    **Market Maker** are exchange-designated firms with quoting obligations.
+
+    - Required to maintain two-sided quotes
+    - Enhanced rebate structures
+    - Liquidity provision incentives
+    - Specialized fee tiers
+    - Performance obligations
+  </Accordion>
+
+  <Accordion title="Away Market Maker">
+    **Away Market Maker** are market makers registered at other exchanges.
+
+    - From competing venues
+    - Standard rebate structures
+    - Cross-exchange liquidity
+    - Different obligation levels
+  </Accordion>
+
+  <Accordion title="Broker Dealer">
+    **Broker Dealer** are registered firms executing for clients and proprietary accounts.
+
+    - SEC registered firms
+    - Client order flow
+    - Proprietary trading
+    - Standard fee structures
+    - Compliance requirements
+  </Accordion>
+
+  <Accordion title="Customer">
+    **Customer** includes retail and institutional investors.
+
+    - End customer orders
+    - Retail investors
+    - Institutional clients
+    - Often receive reduced fees
+    - Protected under customer priority rules
+  </Accordion>
+
+  <Accordion title="Firm">
+    **Firm** represents proprietary trading operations.
+
+    - Principal trading
+    - High-frequency trading firms
+    - Algorithmic trading
+    - Standard fee schedules
+  </Accordion>
+
+  <Accordion title="Professional & Other">
+    **Professional & Other** includes professional traders and miscellaneous categories.
+
+    - Professional individual traders
+    - Specialized trading strategies
+    - Non-standard categorizations
+    - Variable fee structures
+  </Accordion>
+</AccordionGroup>
+
+## Error Responses
+
+<ResponseExample>
+```json 400 Bad Request
+{
+  "error": "Bad Request",
+  "message": "Invalid date format",
+  "details": {
+    "field": "start_date",
+    "expected_format": "YYYY-MM-DD"
+  }
+}
+```
+
+```json 401 Unauthorized
+{
+  "error": "Unauthorized",
+  "message": "Invalid or missing API key"
+}
+```
+
+```json 404 Not Found
+{
+  "error": "Not Found",
+  "message": "Supplier not found"
+}
+```
+</ResponseExample>
+
+## Discovery Workflow
+
+<Tip>
+  **Recommended API Call Sequence**
+
+  All discovery endpoints are independent - call them in any order to explore available data:
+
+  1. Call [List Exchanges](/api-reference/endpoint/list-exchanges) to get all suppliers
+  2. Call [Check Date Ranges](/api-reference/endpoint/date-ranges) to see available time periods
+  3. Call [Get Fee Types](/api-reference/endpoint/fee-types) to see available fee types
+  4. Call [Get Fee Categories](/api-reference/endpoint/fee-categories) to explore fee categories
+  5. Call [Get Actions](/api-reference/endpoint/actions) to see available actions
+  6. Call **Get Participants** to see all participant types
+  7. Finally, query [Supplier Data](/api-reference/endpoint/supplier-data) with your chosen parameters
+</Tip>
